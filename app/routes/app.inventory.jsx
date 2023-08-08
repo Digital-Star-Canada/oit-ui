@@ -7,6 +7,7 @@ import {
     IndexTable,
     useIndexResourceState,
     Text,
+    Button,
 } from "@shopify/polaris";
 import {
     OrdersMajor,
@@ -14,7 +15,7 @@ import {
     ShipmentFilledMajor,
 } from "@shopify/polaris-icons";
 import { useLoaderData } from "@remix-run/react";
-import React from "react";
+import React, {useState} from "react";
 import shopify from "../shopify.server.js";
 import { json } from "@remix-run/node";
 
@@ -22,7 +23,7 @@ export async function loader({ request }) {
     const { admin } = await shopify.authenticate.admin(request);
     const response = await admin.graphql(`
     {
-        productVariants(first: 250, query: "inventory_quantity:<=0") {
+        productVariants(first: 250) {
             edges {
                 node {
                     id
@@ -32,6 +33,7 @@ export async function loader({ request }) {
                     price
                     inventoryQuantity
                     displayName
+                    updatedAt
                 }
             }
         }
@@ -47,6 +49,11 @@ export async function loader({ request }) {
 
 export default function InventoryPage() {
     const variants = useLoaderData();
+    const [renderVariants, setRenderVariants] = useState([]);
+    const [filterButton, setFilterButton] = useState(false);
+    if (variants !== renderVariants && filterButton === false) {
+        setRenderVariants(variants);
+    }
     console.log(variants);
     const resourceName = {
         singular: "variant",
@@ -54,9 +61,9 @@ export default function InventoryPage() {
     };
 
     const { selectedResources, allResourcesSelected, handleSelectionChange } =
-        useIndexResourceState(variants);
+        useIndexResourceState(renderVariants);
 
-    const rowMarkup = variants.map(
+    const rowMarkup = renderVariants.map(
         (
             {
                 node: {
@@ -67,6 +74,7 @@ export default function InventoryPage() {
                     price,
                     inventoryQuantity,
                     displayName,
+                    updatedAt,
                 },
             },
             index
@@ -83,6 +91,7 @@ export default function InventoryPage() {
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>{sku}</IndexTable.Cell>
+                <IndexTable.Cell>{updatedAt}</IndexTable.Cell>
                 <IndexTable.Cell>
                     ${price}
                 </IndexTable.Cell>
@@ -99,10 +108,18 @@ export default function InventoryPage() {
 
     const product_variant_cell_styles = `
         .Index-Table-Cell_Product-variant_Width{
-            max-width: 200px;
+            max-width: 100px;
             overflow-x: auto;
         }
     `;
+
+    const filterControl = () => {
+        const filteredVariants = variants.filter((renderVariant) => {
+            return renderVariant.node.inventoryQuantity < 50;
+        });
+        setRenderVariants(filteredVariants);
+        setFilterButton(true);
+    }
 
     return (
         <>
@@ -111,6 +128,11 @@ export default function InventoryPage() {
         </style>
         <Page>
             <Frame>
+                <HorizontalStack gap="3" align="end">
+                    <Button primary onClick={filterControl}>
+                        Filter
+                    </Button>
+                </HorizontalStack>
                 <HorizontalStack wrap={false} align="center">
                     <Navigation location="/">
                         <Navigation.Section
@@ -137,7 +159,7 @@ export default function InventoryPage() {
                     <LegacyCard>
                         <IndexTable
                             resourceName={resourceName}
-                            itemCount={variants.length}
+                            itemCount={renderVariants.length}
                             selectedItemsCount={
                                 allResourcesSelected ? "All" : selectedResources.length
                             }
@@ -145,6 +167,7 @@ export default function InventoryPage() {
                             headings={[
                                 { title: "Product variant" },
                                 { title: "SKU" },
+                                { title: "Last update date" },
                                 { title: "Price", alignment: "end"},
                                 { title: "Available for sale"},
                                 { title: "Inventory"},

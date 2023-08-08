@@ -7,6 +7,7 @@ import {
     IndexTable,
     useIndexResourceState,
     Text,
+    Button,
 } from "@shopify/polaris";
 import {
     OrdersMajor,
@@ -14,7 +15,7 @@ import {
     ShipmentFilledMajor,
 } from "@shopify/polaris-icons";
 import { useLoaderData } from "@remix-run/react";
-import React from "react";
+import React, {useState} from "react";
 import shopify from "../shopify.server.js";
 import { json } from "@remix-run/node";
 
@@ -31,6 +32,7 @@ export async function loader({ request }) {
                     fullyPaid
                     unpaid
                     tags
+                    cancelledAt
                     subtotalPriceSet {
                         presentmentMoney {
                             amount
@@ -55,15 +57,20 @@ export async function loader({ request }) {
 
 export default function Index() {
     const orders = useLoaderData();
+    const [renderOrders, setRenderOrders] = useState([]);
+    const [filterButton, setFilterButton] = useState(false);
+    if (orders !== renderOrders && filterButton === false) {
+        setRenderOrders(orders);
+    }
     const resourceName = {
         singular: "order",
         plural: "orders",
     };
 
     const { selectedResources, allResourcesSelected, handleSelectionChange } =
-        useIndexResourceState(orders);
+        useIndexResourceState(renderOrders);
 
-    const rowMarkup = orders.map(
+    const rowMarkup = renderOrders.map(
         (
             {
                 node: {
@@ -72,7 +79,6 @@ export default function Index() {
                     createdAt,
                     customer,
                     subtotalPriceSet,
-                    paymentStatus,
                     fullyPaid,
                     unpaid,
                 },
@@ -108,10 +114,25 @@ export default function Index() {
         )
     );
 
+    const filterControl = () => {
+        const filteredOrders = orders.filter((renderOrder) => {
+            return renderOrder.node.tags.includes("Ready to Sync");
+        }).filter((renderOrder) => {
+            return renderOrder.node.cancelledAt === null;
+        });
+        setRenderOrders(filteredOrders);
+        setFilterButton(true);
+    }
+
     return (
         <Page>
             <Frame>
-                <HorizontalStack wrap={false} align="center">
+                <HorizontalStack gap="3" align="end">
+                    <Button primary onClick={filterControl}>
+                        Filter
+                    </Button>
+                </HorizontalStack>
+                <HorizontalStack wrap={false} align="end">
                     <Navigation location="/">
                         <Navigation.Section
                             items={[
@@ -137,7 +158,7 @@ export default function Index() {
                     <LegacyCard>
                         <IndexTable
                             resourceName={resourceName}
-                            itemCount={orders.length}
+                            itemCount={renderOrders.length}
                             selectedItemsCount={
                                 allResourcesSelected ? "All" : selectedResources.length
                             }
