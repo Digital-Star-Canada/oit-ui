@@ -1,0 +1,27 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "oit-ui"
+client_id = "b9949f367609d6b7ac07762a9589a540"
+application_url = "https://produces-strengthen-box-cb.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products,read_product_listings,read_orders,read_customers"
+
+[auth]
+redirect_urls = [
+  "https://produces-strengthen-box-cb.trycloudflare.com/auth/callback",
+  "https://produces-strengthen-box-cb.trycloudflare.com/auth/shopify/callback",
+  "https://produces-strengthen-box-cb.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2023-07"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "digitalstar-demo-store.myshopify.com"
