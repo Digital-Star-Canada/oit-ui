@@ -57,11 +57,12 @@ export async function loader({ request }) {
 
 export default function Index() {
     const orders = useLoaderData();
-    const [renderOrders, setRenderOrders] = useState([]);
-    const [filterButton, setFilterButton] = useState(false);
-    if (orders !== renderOrders && filterButton === false) {
-        setRenderOrders(orders);
-    }
+    const renderOrders = orders.filter((renderOrder) => {
+        return renderOrder.node.tags.includes("Ready to Sync");
+    }).filter((renderOrder) => {
+        return renderOrder.node.cancelledAt === null;
+    });
+
     const resourceName = {
         singular: "order",
         plural: "orders",
@@ -114,22 +115,12 @@ export default function Index() {
         )
     );
 
-    const filterControl = () => {
-        const filteredOrders = orders.filter((renderOrder) => {
-            return renderOrder.node.tags.includes("Ready to Sync");
-        }).filter((renderOrder) => {
-            return renderOrder.node.cancelledAt === null;
-        });
-        setRenderOrders(filteredOrders);
-        setFilterButton(true);
-    }
-
     return (
         <Page>
             <Frame>
                 <HorizontalStack gap="3" align="end">
-                    <Button primary onClick={filterControl}>
-                        Filter
+                    <Button primary>
+                        Sync
                     </Button>
                 </HorizontalStack>
                 <HorizontalStack wrap={false} align="end">
