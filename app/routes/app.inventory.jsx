@@ -120,7 +120,7 @@ export default function InventoryPage() {
             <Frame>
                 <HorizontalStack gap="3" align="end">
                     <Button primary>
-                        Filter
+                        Sync
                     </Button>
                 </HorizontalStack>
                 <HorizontalStack wrap={false} align="center">
