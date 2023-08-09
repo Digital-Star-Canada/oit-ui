@@ -49,12 +49,10 @@ export async function loader({ request }) {
 
 export default function InventoryPage() {
     const variants = useLoaderData();
-    const [renderVariants, setRenderVariants] = useState([]);
-    const [filterButton, setFilterButton] = useState(false);
-    if (variants !== renderVariants && filterButton === false) {
-        setRenderVariants(variants);
-    }
-    console.log(variants);
+    const renderVariants = variants.filter((renderVariant) => {
+        return renderVariant.node.inventoryQuantity < 50;
+    });
+
     const resourceName = {
         singular: "variant",
         plural: "variants",
@@ -113,14 +111,6 @@ export default function InventoryPage() {
         }
     `;
 
-    const filterControl = () => {
-        const filteredVariants = variants.filter((renderVariant) => {
-            return renderVariant.node.inventoryQuantity < 50;
-        });
-        setRenderVariants(filteredVariants);
-        setFilterButton(true);
-    }
-
     return (
         <>
         <style>
@@ -129,7 +119,7 @@ export default function InventoryPage() {
         <Page>
             <Frame>
                 <HorizontalStack gap="3" align="end">
-                    <Button primary onClick={filterControl}>
+                    <Button primary>
                         Filter
                     </Button>
                 </HorizontalStack>
