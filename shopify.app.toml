@@ -2,7 +2,7 @@
 
 name = "oit-ui"
 client_id = "b9949f367609d6b7ac07762a9589a540"
-application_url = "https://slow-unsigned-ia-seats.trycloudflare.com"
+application_url = "https://connect-catalogue-resolution-contacts.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -11,9 +11,9 @@ scopes = "write_products,read_product_listings,read_orders,read_customers"
 
 [auth]
 redirect_urls = [
-  "https://slow-unsigned-ia-seats.trycloudflare.com/auth/callback",
-  "https://slow-unsigned-ia-seats.trycloudflare.com/auth/shopify/callback",
-  "https://slow-unsigned-ia-seats.trycloudflare.com/api/auth/callback"
+  "https://connect-catalogue-resolution-contacts.trycloudflare.com/auth/callback",
+  "https://connect-catalogue-resolution-contacts.trycloudflare.com/auth/shopify/callback",
+  "https://connect-catalogue-resolution-contacts.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

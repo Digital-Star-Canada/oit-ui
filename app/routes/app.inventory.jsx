@@ -58,8 +58,12 @@ export default function InventoryPage() {
         plural: "variants",
     };
 
+    const resourceIDResolver = (renderVariants) => {
+        return renderVariants.node.id;
+    };
+
     const { selectedResources, allResourcesSelected, handleSelectionChange } =
-        useIndexResourceState(renderVariants);
+        useIndexResourceState(renderVariants, {resourceIDResolver,});
 
     const rowMarkup = renderVariants.map(
         (

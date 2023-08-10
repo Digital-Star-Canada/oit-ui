@@ -68,8 +68,12 @@ export default function Index() {
         plural: "orders",
     };
 
+    const resourceIDResolver = (renderOrders) => {
+        return renderOrders.node.id;
+    };
+
     const { selectedResources, allResourcesSelected, handleSelectionChange } =
-        useIndexResourceState(renderOrders);
+        useIndexResourceState(renderOrders, {resourceIDResolver,});
 
     const rowMarkup = renderOrders.map(
         (
